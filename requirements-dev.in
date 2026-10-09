@@ -1,0 +1,4 @@
+# M1 local data inspection dependencies.
+pytest==9.1.1
+polars==1.44.2
+duckdb==1.5.5

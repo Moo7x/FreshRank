@@ -1,0 +1,41 @@
+# Local Python environment
+.venv/
+
+# Private tutoring records and local agent instructions
+/AGENTS.md
+/FRESHRANK_LEARNING_PLAN.md
+/PROJECT_PROGRESS.md
+/LEARNING_LOG.md
+
+# Local credentials and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python-generated files
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Test and tool caches
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local data and generated artifacts (document exceptions deliberately)
+data/
+artifacts/
+models/
+mlruns/
+
+# Dataset files and archives, including accidental copies outside data/
+*.parquet
+*.zip

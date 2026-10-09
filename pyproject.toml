@@ -1,0 +1,12 @@
+[project]
+name = "freshrank"
+version = "0.1.0"
+description = "Learning-first experiments in trustworthy news recommendation"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+pythonpath = ["src"]
+testpaths = ["tests"]
