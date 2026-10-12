@@ -34,6 +34,19 @@ def test_ties_use_article_id_not_input_order() -> None:
     assert first.mrr == 0.5
 
 
+def test_distinct_scores_and_labels_must_follow_their_article_ids() -> None:
+    ids = [101, 205, 309, 412]
+    scores = [4.0, 3.0, 2.0, 1.0]
+    labels = [1, 0, 1, 0]
+    original = score_impression(ids, scores, labels)
+    aligned_rows = list(zip(ids, scores, labels, strict=True))[::-1]
+    new_ids, new_scores, new_labels = map(list, zip(*aligned_rows, strict=True))
+    assert score_impression(new_ids, new_scores, new_labels) == original
+    # Same lengths, valid types, finite scores: the wrong pairing still passes
+    # structural validation. Only a semantic/identity check catches the mistake.
+    assert score_impression(new_ids, scores, new_labels) != original
+
+
 def test_no_positive_is_excluded_and_reported() -> None:
     no_click = score_impression([10, 20], [1.0, 0.0], [0, 0])
     clicked = score_impression([10, 20], [1.0, 0.0], [1, 0])

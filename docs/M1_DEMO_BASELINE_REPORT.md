@@ -41,6 +41,32 @@ Of 46,497 tuning candidate appearances, 40,615 (about 87.4%) have no fixed-histo
 
 The history timestamps establish an event-time boundary, not when a production feature pipeline would have received every event; the latest click is only 12 seconds before the behavior period. This baseline is a conservative offline proxy under the fixed-history assumption, not a demonstration of online feature availability. Neither offline score estimates live click-through rate, and the shuffled stored candidate order prevents reconstructing original display-position effects.
 
+A [12 October coverage attribution](M1_POPULARITY_COVERAGE.md) finds that 39,007 of the 40,615 zero-count candidate appearances have recorded publication times after the latest fixed-history event. This explains a dominant temporal coverage limitation under the publication-time assumption; it does not establish a causal explanation for the metric difference.
+
 ## Verification and next work
 
-Twenty-four tests pass, including future-history rejection, future-published-article rejection, unseen-article handling, tie-break-only control behavior, and separation of later click labels from score inputs. The demo result must be repeated on the small bundle before claiming the main M1 baseline is complete; official validation remains reserved for frozen configurations.
+As of 12 October, 38 tests pass, including future-history rejection, future-published-article rejection, unseen-article handling, tie-break-only control behavior, separation of later click labels from score inputs, coverage attribution, complete experiment orchestration and candidate-score alignment.
+
+The complete demo can now be reproduced with one command:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\run_m1_experiment.py data\ebnerd_demo data\processed\demo_run_01
+```
+
+Use a fresh output directory. The run saves cleaned partitions and an aggregate `run.json` with runtime versions and SHA-256 fingerprints of training inputs and package source. Two real-data runs on 12 October reproduced the same audit, preparation, baseline and coverage results with matching input/source fingerprints. Elapsed time and completion timestamps are not deterministic results. This is verification in the current environment, not a cross-platform reproducibility claim.
+
+The demo result must be repeated on the small bundle before claiming the main M1 baseline is complete; official validation remains reserved for frozen configurations. The implemented rules remain provisional rather than a user-ratified final evaluation protocol.
+
+## Candidate-alignment controlled failure (12 October)
+
+Run the isolated teaching diagnostic on an existing prepared run:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\check_candidate_alignment.py data\ebnerd_demo data\processed\demo_run_01
+```
+
+Reversing each candidate list and recomputing its features by article identity preserves the complete three-rule comparison on all 4,217 tuning impressions. A deliberately broken branch reverses candidate IDs but retains old-order recency scores; labels are still attached to the correct IDs. This silently assigns scores to the wrong articles while retaining valid types and list lengths.
+
+The deliberate fault changes metric pairs on 3,907 impressions. Correct recency mean NDCG@10/MRR is 0.438529 / 0.320545; the broken branch scores 0.439302 / 0.318433. The slightly higher NDCG must not be interpreted as improvement: correctness requires identity alignment, not a preferred metric direction. This faulty branch is isolated from the experiment runner and is not an alternative recommender.
+
+Two regression tests cover complete-comparison order invariance and aligned distinct-score/label permutations. The full suite now has 38 passing tests. Neither this diagnostic nor these fixtures change the evaluation protocol or access official validation.

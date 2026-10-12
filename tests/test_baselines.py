@@ -135,3 +135,20 @@ def test_popularity_is_distinct_from_the_id_only_control_when_history_helps() ->
     assert result.article_id_control.mean_ndcg_at_10 == pytest.approx(1 / 1.584962500721156)
     assert result.popularity_changes_id_order == 1
     assert (result.popularity_better_than_id_impressions, result.id_better_than_popularity_impressions) == (1, 0)
+
+
+def test_candidate_storage_order_preserves_the_complete_comparison() -> None:
+    tuning = pl.DataFrame({
+        "impression_id": [1, 2],
+        "impression_time": [START + timedelta(days=1), START + timedelta(days=2)],
+        "article_ids_inview": [[40, 20, 10, 30], [30, 10, 40, 20]],
+        "article_ids_clicked": [[20, 40], [10]],
+    })
+    articles = pl.DataFrame({
+        "article_id": [10, 20, 30, 40],
+        "published_time": [START - timedelta(days=2), START - timedelta(hours=2),
+                           START - timedelta(hours=1), START - timedelta(minutes=5)],
+    })
+    original = compare_baselines(tuning, articles, _history(), START)
+    reversed_candidates = tuning.with_columns(pl.col("article_ids_inview").list.reverse())
+    assert compare_baselines(reversed_candidates, articles, _history(), START) == original

@@ -82,6 +82,14 @@ data/ebnerd_demo/
 After obtaining and extracting the dataset, run:
 
 ```powershell
+.\.venv\Scripts\python.exe scripts\run_m1_experiment.py data\ebnerd_demo data\processed\demo_run_01
+```
+
+This runs the training audit, whole-impression preparation, three-rule comparison and popularity-coverage audit together. It saves the prepared partitions and `run.json`, including aggregate results, Python/Polars versions and SHA-256 fingerprints of training inputs and package source files. A fingerprint identifies the exact file contents so repeated experiments can check whether their inputs match. Official validation is not read. Existing output directories are never overwritten; choose a fresh name for another run.
+
+The individual steps remain available:
+
+```powershell
 .\.venv\Scripts\python.exe scripts\audit_ebnerd_training.py data\ebnerd_demo
 .\.venv\Scripts\python.exe scripts\prepare_ebnerd_demo.py data\ebnerd_demo data\processed\demo_m1
 .\.venv\Scripts\python.exe scripts\evaluate_demo_baselines.py data\ebnerd_demo data\processed\demo_m1
@@ -96,6 +104,14 @@ For an executable history-count example that uses synthetic data and requires no
 ```
 
 Measured results and their limits are recorded in the [demo baseline report](docs/M1_DEMO_BASELINE_REPORT.md).
+
+To attribute missing popularity counts using recorded publication times and the fixed-history boundary:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\audit_popularity_coverage.py data\ebnerd_demo data\processed\demo_m1
+```
+
+The [coverage audit](docs/M1_POPULARITY_COVERAGE.md) preserves the full tuning candidate population and reports aggregate findings.
 
 ## Current development evaluation
 
@@ -126,6 +142,7 @@ tests/                          Reproducibility and data-tooling tests
 - [EB-NeRD data audit](docs/EBNERD_DATA_AUDIT.md)
 - [M1 ranking-example walkthrough](docs/M1_RANKING_EXAMPLES.md)
 - [M1 demo baseline diagnostic](docs/M1_DEMO_BASELINE_REPORT.md)
+- [M1 popularity coverage attribution](docs/M1_POPULARITY_COVERAGE.md)
 - [Draft strict-replay data contract](docs/adr/0001-strict-replay-feature-availability.md)
 
 FreshRank adapts public research and the official EB-NeRD resources for learning. It does not claim a novel recommendation architecture.
